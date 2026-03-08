@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/orders.schema.json",
+  "title": "OrderEvent",
+  "description": "Schema for order events produced into the events.orders.v1 Kafka topic.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_time",
+    "ingestion_time",
+    "producer_version",
+    "schema_version",
+    "source_system",
+    "partition_key",
+    "trace_id",
+    "order_id",
+    "user_id",
+    "merchant_id",
+    "order_status",
+    "order_currency",
+    "order_amount",
+    "item_count",
+    "payment_required",
+    "channel",
+    "platform",
+    "region",
+    "country_code"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique identifier for the event.",
+      "pattern": "^[A-Za-z0-9._:-]{12,128}$"
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Logical event type.",
+      "const": "order_event"
+    },
+    "event_time": {
+      "type": "string",
+      "description": "Timestamp when the order event occurred in the source system, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "ingestion_time": {
+      "type": "string",
+      "description": "Timestamp when the event was emitted by the producer, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "producer_version": {
+      "type": "string",
+      "description": "Version of the producing application.",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "schema_version": {
+      "type": "integer",
+      "description": "Schema version for the event contract.",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "source_system": {
+      "type": "string",
+      "description": "Logical source application or service that generated the event.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "partition_key": {
+      "type": "string",
+      "description": "Key used to partition the event in Kafka.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "trace_id": {
+      "type": "string",
+      "description": "Trace or correlation identifier for distributed event tracking.",
+      "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Logical business identifier of the order.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "parent_order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional parent identifier for split, replacement, or grouped orders.",
+      "maxLength": 64
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Identifier of the user who placed the order.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "merchant_id": {
+      "type": "string",
+      "description": "Identifier of the merchant, seller, or fulfilment partner.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "order_status": {
+      "type": "string",
+      "description": "Lifecycle status of the order at event time.",
+      "enum": [
+        "created",
+        "submitted",
+        "confirmed",
+        "packed",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "returned",
+        "failed"
+      ]
+    },
+    "order_currency": {
+      "type": "string",
+      "description": "ISO 4217 currency code.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "order_amount": {
+      "type": "number",
+      "description": "Gross order amount before optional refunds, expressed in order currency.",
+      "minimum": 0
+    },
+    "discount_amount": {
+      "type": "number",
+      "description": "Discount amount applied to the order, expressed in order currency.",
+      "minimum": 0,
+      "default": 0
+    },
+    "shipping_amount": {
+      "type": "number",
+      "description": "Shipping charge applied to the order, expressed in order currency.",
+      "minimum": 0,
+      "default": 0
+    },
+    "tax_amount": {
+      "type": "number",
+      "description": "Tax amount applied to the order, expressed in order currency.",
+      "minimum": 0,
+      "default": 0
+    },
+    "net_amount": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Optional net order amount after discounts and adjustments, expressed in order currency.",
+      "minimum": 0
+    },
+    "item_count": {
+      "type": "integer",
+      "description": "Number of items included in the order.",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "payment_required": {
+      "type": "boolean",
+      "description": "Whether the order requires a payment transaction."
+    },
+    "payment_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional payment status available at the time of the order event.",
+      "enum": [
+        "pending",
+        "authorised",
+        "captured",
+        "failed",
+        "refunded",
+        null
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "description": "Commercial or interaction channel used to create the order.",
+      "enum": [
+        "web",
+        "mobile_app",
+        "call_center",
+        "partner_api",
+        "in_store"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Technical platform where the order originated.",
+      "enum": [
+        "web",
+        "android",
+        "ios",
+        "backend_api",
+        "pos"
+      ]
+    },
+    "region": {
+      "type": "string",
+      "description": "Logical business region associated with the order.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code.",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "fulfilment_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Fulfilment model associated with the order.",
+      "enum": [
+        "delivery",
+        "pickup",
+        "ship_to_home",
+        "digital",
+        null
+      ]
+    },
+    "payment_method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Primary payment method associated with the order when known.",
+      "enum": [
+        "credit_card",
+        "debit_card",
+        "pix",
+        "wallet",
+        "cash",
+        "bank_transfer",
+        null
+      ]
+    },
+    "customer_tier": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional commercial segmentation of the customer.",
+      "enum": [
+        "new",
+        "returning",
+        "vip",
+        null
+      ]
+    },
+    "items": {
+      "type": "array",
+      "description": "Optional line-item details for the order.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item_id",
+          "sku",
+          "quantity",
+          "unit_price"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "sku": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "product_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "unit_price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "discount_amount": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      },
+      "default": []
+    },
+    "event_properties": {
+      "type": "object",
+      "description": "Optional flexible map for low-criticality event attributes that do not justify top-level fields.",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      },
+      "default": {}
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_order_20260308_000001",
+      "event_type": "order_event",
+      "event_time": "2026-03-08T12:05:14Z",
+      "ingestion_time": "2026-03-08T12:05:15Z",
+      "producer_version": "1.0.0",
+      "schema_version": 1,
+      "source_system": "commerce-backend",
+      "partition_key": "ord_938471",
+      "trace_id": "trace_4c0d781f22",
+      "order_id": "ord_938471",
+      "parent_order_id": null,
+      "user_id": "user_18429",
+      "merchant_id": "merchant_2201",
+      "order_status": "submitted",
+      "order_currency": "BRL",
+      "order_amount": 249.90,
+      "discount_amount": 20.00,
+      "shipping_amount": 12.90,
+      "tax_amount": 0.00,
+      "net_amount": 242.80,
+      "item_count": 3,
+      "payment_required": true,
+      "payment_status": "pending",
+      "channel": "mobile_app",
+      "platform": "android",
+      "region": "southeast",
+      "country_code": "BR",
+      "fulfilment_type": "delivery",
+      "payment_method": "pix",
+      "customer_tier": "returning",
+      "items": [
+        {
+          "item_id": "item_1",
+          "sku": "sku_keyboard_001",
+          "product_name": "Mechanical Keyboard",
+          "category": "peripherals",
+          "quantity": 1,
+          "unit_price": 189.90,
+          "discount_amount": 10.00
+        },
+        {
+          "item_id": "item_2",
+          "sku": "sku_mousepad_002",
+          "product_name": "Extended Mouse Pad",
+          "category": "accessories",
+          "quantity": 2,
+          "unit_price": 30.00,
+          "discount_amount": 10.00
+        }
+      ],
+      "event_properties": {
+        "coupon_code": "WELCOME10",
+        "estimated_delivery_hours": 4,
+        "is_expedited": true
+      }
+    }
+  ]
+}

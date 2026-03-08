@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/user_activity.schema.json",
+  "title": "UserActivityEvent",
+  "description": "Schema for user activity events produced into the events.user_activity.v1 Kafka topic.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_time",
+    "ingestion_time",
+    "producer_version",
+    "schema_version",
+    "source_system",
+    "partition_key",
+    "trace_id",
+    "user_id",
+    "session_id",
+    "action_type",
+    "channel",
+    "platform",
+    "device_type",
+    "page",
+    "region",
+    "country_code",
+    "is_authenticated"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique identifier for the event.",
+      "pattern": "^[A-Za-z0-9._:-]{12,128}$"
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Logical event type.",
+      "const": "user_activity"
+    },
+    "event_time": {
+      "type": "string",
+      "description": "Timestamp when the event occurred in the source system, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "ingestion_time": {
+      "type": "string",
+      "description": "Timestamp when the event was emitted by the producer, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "producer_version": {
+      "type": "string",
+      "description": "Version of the producing application.",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "schema_version": {
+      "type": "integer",
+      "description": "Schema version for the event contract.",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "source_system": {
+      "type": "string",
+      "description": "Logical source application or service that generated the event.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "partition_key": {
+      "type": "string",
+      "description": "Key used to partition the event in Kafka.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "trace_id": {
+      "type": "string",
+      "description": "Trace or correlation identifier for distributed event tracking.",
+      "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Logical identifier of the user performing the action.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Identifier of the user session associated with the action.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "action_type": {
+      "type": "string",
+      "description": "User action captured by the event.",
+      "enum": [
+        "page_view",
+        "click",
+        "search",
+        "login",
+        "logout",
+        "add_to_cart",
+        "remove_from_cart",
+        "checkout_start",
+        "purchase_complete",
+        "form_submit",
+        "video_play",
+        "video_pause"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "description": "Digital acquisition or interaction channel.",
+      "enum": [
+        "web",
+        "mobile_app",
+        "email",
+        "push_notification",
+        "paid_media",
+        "organic"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Execution platform where the user action occurred.",
+      "enum": [
+        "web",
+        "android",
+        "ios"
+      ]
+    },
+    "device_type": {
+      "type": "string",
+      "description": "Client device category.",
+      "enum": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "smart_tv"
+      ]
+    },
+    "page": {
+      "type": "string",
+      "description": "Page, screen, or application section where the event occurred.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "referrer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Referrer or previous page when available.",
+      "maxLength": 512
+    },
+    "campaign_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Marketing campaign identifier associated with the event when relevant.",
+      "maxLength": 128
+    },
+    "region": {
+      "type": "string",
+      "description": "Logical user region used for analytical segmentation.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code.",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "language": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Language or locale preference when available.",
+      "maxLength": 16
+    },
+    "is_authenticated": {
+      "type": "boolean",
+      "description": "Whether the action was performed by an authenticated user."
+    },
+    "experiment_assignments": {
+      "type": "array",
+      "description": "Optional experiment assignments active for the user at event time.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "experiment_id",
+          "variant"
+        ],
+        "properties": {
+          "experiment_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "variant": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      },
+      "default": []
+    },
+    "event_properties": {
+      "type": "object",
+      "description": "Optional flexible map for low-criticality event attributes that do not justify top-level fields.",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      },
+      "default": {}
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_user_20260308_000001",
+      "event_type": "user_activity",
+      "event_time": "2026-03-08T12:00:05Z",
+      "ingestion_time": "2026-03-08T12:00:06Z",
+      "producer_version": "1.0.0",
+      "schema_version": 1,
+      "source_system": "web-frontend",
+      "partition_key": "user_18429",
+      "trace_id": "trace_9fd12ae7c1",
+      "user_id": "user_18429",
+      "session_id": "sess_7845129",
+      "action_type": "page_view",
+      "channel": "web",
+      "platform": "web",
+      "device_type": "desktop",
+      "page": "/products/streaming-lakehouse",
+      "referrer": "/home",
+      "campaign_id": "camp_q1_brand_01",
+      "region": "southeast",
+      "country_code": "BR",
+      "language": "pt-BR",
+      "is_authenticated": true,
+      "experiment_assignments": [
+        {
+          "experiment_id": "exp_homepage_layout",
+          "variant": "B"
+        }
+      ],
+      "event_properties": {
+        "button_name": "learn_more",
+        "scroll_depth_pct": 67,
+        "abandonment_risk_score": 0.14
+      }
+    }
+  ]
+}

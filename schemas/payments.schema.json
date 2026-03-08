@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/payments.schema.json",
+  "title": "PaymentEvent",
+  "description": "Schema for payment events produced into the events.payments.v1 Kafka topic.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_time",
+    "ingestion_time",
+    "producer_version",
+    "schema_version",
+    "source_system",
+    "partition_key",
+    "trace_id",
+    "payment_id",
+    "order_id",
+    "user_id",
+    "merchant_id",
+    "payment_status",
+    "payment_method",
+    "payment_amount",
+    "currency",
+    "is_refund",
+    "channel",
+    "platform",
+    "region",
+    "country_code"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique identifier for the event.",
+      "pattern": "^[A-Za-z0-9._:-]{12,128}$"
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Logical event type.",
+      "const": "payment_event"
+    },
+    "event_time": {
+      "type": "string",
+      "description": "Timestamp when the payment event occurred in the source system, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "ingestion_time": {
+      "type": "string",
+      "description": "Timestamp when the event was emitted by the producer, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "producer_version": {
+      "type": "string",
+      "description": "Version of the producing application.",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "schema_version": {
+      "type": "integer",
+      "description": "Schema version for the event contract.",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "source_system": {
+      "type": "string",
+      "description": "Logical source application or service that generated the event.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "partition_key": {
+      "type": "string",
+      "description": "Key used to partition the event in Kafka.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "trace_id": {
+      "type": "string",
+      "description": "Trace or correlation identifier for distributed event tracking.",
+      "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+    },
+    "payment_id": {
+      "type": "string",
+      "description": "Logical identifier of the payment transaction.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "parent_payment_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional parent payment identifier for retries, partial captures, or refund chains.",
+      "maxLength": 64
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Business identifier of the related order.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Identifier of the user associated with the payment.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "merchant_id": {
+      "type": "string",
+      "description": "Identifier of the merchant or payment beneficiary.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "payment_status": {
+      "type": "string",
+      "description": "Lifecycle status of the payment at event time.",
+      "enum": [
+        "initiated",
+        "pending",
+        "authorised",
+        "captured",
+        "settled",
+        "failed",
+        "cancelled",
+        "refunded",
+        "chargeback"
+      ]
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Primary payment method used for the transaction.",
+      "enum": [
+        "credit_card",
+        "debit_card",
+        "pix",
+        "wallet",
+        "cash",
+        "bank_transfer"
+      ]
+    },
+    "payment_provider": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "External PSP, acquirer, or payment gateway when applicable.",
+      "maxLength": 64
+    },
+    "payment_amount": {
+      "type": "number",
+      "description": "Payment amount expressed in transaction currency.",
+      "minimum": 0
+    },
+    "currency": {
+      "type": "string",
+      "description": "ISO 4217 currency code.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "authorised_amount": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Optional authorised amount expressed in transaction currency.",
+      "minimum": 0
+    },
+    "captured_amount": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Optional captured amount expressed in transaction currency.",
+      "minimum": 0
+    },
+    "refunded_amount": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Optional refunded amount expressed in transaction currency.",
+      "minimum": 0
+    },
+    "is_refund": {
+      "type": "boolean",
+      "description": "Whether this event represents a refund-related payment flow."
+    },
+    "failure_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Failure reason when the payment is unsuccessful.",
+      "maxLength": 256
+    },
+    "payment_attempt": {
+      "type": "integer",
+      "description": "Attempt sequence number for the payment flow.",
+      "minimum": 1,
+      "maximum": 50,
+      "default": 1
+    },
+    "installments": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Number of installments when applicable.",
+      "minimum": 1,
+      "maximum": 36
+    },
+    "channel": {
+      "type": "string",
+      "description": "Commercial or interaction channel associated with the payment.",
+      "enum": [
+        "web",
+        "mobile_app",
+        "call_center",
+        "partner_api",
+        "in_store"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Technical platform where the payment originated.",
+      "enum": [
+        "web",
+        "android",
+        "ios",
+        "backend_api",
+        "pos"
+      ]
+    },
+    "region": {
+      "type": "string",
+      "description": "Logical business region associated with the payment.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code.",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "card_brand": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Card network brand when applicable.",
+      "enum": [
+        "visa",
+        "mastercard",
+        "amex",
+        "elo",
+        "hipercard",
+        null
+      ]
+    },
+    "gateway_transaction_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "External transaction identifier assigned by the gateway or PSP.",
+      "maxLength": 128
+    },
+    "settlement_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Settlement date when applicable, in YYYY-MM-DD format.",
+      "format": "date"
+    },
+    "event_properties": {
+      "type": "object",
+      "description": "Optional flexible map for low-criticality payment attributes that do not justify top-level fields.",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      },
+      "default": {}
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_payment_20260308_000001",
+      "event_type": "payment_event",
+      "event_time": "2026-03-08T12:05:22Z",
+      "ingestion_time": "2026-03-08T12:05:23Z",
+      "producer_version": "1.0.0",
+      "schema_version": 1,
+      "source_system": "payment-service",
+      "partition_key": "ord_938471",
+      "trace_id": "trace_4c0d781f22",
+      "payment_id": "pay_550019",
+      "parent_payment_id": null,
+      "order_id": "ord_938471",
+      "user_id": "user_18429",
+      "merchant_id": "merchant_2201",
+      "payment_status": "authorised",
+      "payment_method": "pix",
+      "payment_provider": "gateway_x",
+      "payment_amount": 242.80,
+      "currency": "BRL",
+      "authorised_amount": 242.80,
+      "captured_amount": null,
+      "refunded_amount": null,
+      "is_refund": false,
+      "failure_reason": null,
+      "payment_attempt": 1,
+      "installments": null,
+      "channel": "mobile_app",
+      "platform": "android",
+      "region": "southeast",
+      "country_code": "BR",
+      "card_brand": null,
+      "gateway_transaction_id": "gw_txn_91af20f8",
+      "settlement_date": "2026-03-09",
+      "event_properties": {
+        "risk_score": 0.07,
+        "anti_fraud_passed": true,
+        "latency_ms": 842
+      }
+    }
+  ]
+}

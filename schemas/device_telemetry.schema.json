@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/device_telemetry.schema.json",
+  "title": "DeviceTelemetryEvent",
+  "description": "Schema for device telemetry events produced into the events.device_telemetry.v1 Kafka topic.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_time",
+    "ingestion_time",
+    "producer_version",
+    "schema_version",
+    "source_system",
+    "partition_key",
+    "trace_id",
+    "device_id",
+    "metric_name",
+    "metric_type",
+    "metric_value",
+    "metric_unit",
+    "platform",
+    "device_type",
+    "app_version",
+    "os_name",
+    "os_version",
+    "region",
+    "country_code"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique identifier for the event.",
+      "pattern": "^[A-Za-z0-9._:-]{12,128}$"
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Logical event type.",
+      "const": "device_telemetry"
+    },
+    "event_time": {
+      "type": "string",
+      "description": "Timestamp when the telemetry event occurred in the source system, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "ingestion_time": {
+      "type": "string",
+      "description": "Timestamp when the event was emitted by the producer, in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "producer_version": {
+      "type": "string",
+      "description": "Version of the producing application.",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "schema_version": {
+      "type": "integer",
+      "description": "Schema version for the event contract.",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "source_system": {
+      "type": "string",
+      "description": "Logical source application or service that generated the telemetry event.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "partition_key": {
+      "type": "string",
+      "description": "Key used to partition the event in Kafka.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "trace_id": {
+      "type": "string",
+      "description": "Trace or correlation identifier for distributed event tracking.",
+      "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+    },
+    "device_id": {
+      "type": "string",
+      "description": "Logical identifier of the device emitting the telemetry.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional identifier of the user associated with the device session.",
+      "maxLength": 64
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional session identifier associated with the telemetry event.",
+      "maxLength": 128
+    },
+    "metric_name": {
+      "type": "string",
+      "description": "Logical metric captured by the telemetry event.",
+      "enum": [
+        "cpu_usage_pct",
+        "memory_usage_mb",
+        "battery_level_pct",
+        "network_latency_ms",
+        "app_launch_time_ms",
+        "frame_drop_count",
+        "crash_count",
+        "api_error_count",
+        "disk_usage_pct",
+        "temperature_c"
+      ]
+    },
+    "metric_type": {
+      "type": "string",
+      "description": "Type of metric value represented by the event.",
+      "enum": [
+        "gauge",
+        "counter",
+        "histogram_sample"
+      ]
+    },
+    "metric_value": {
+      "type": "number",
+      "description": "Numeric value of the metric."
+    },
+    "metric_unit": {
+      "type": "string",
+      "description": "Measurement unit associated with the metric.",
+      "enum": [
+        "pct",
+        "ms",
+        "count",
+        "mb",
+        "celsius"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Technical platform where the telemetry originated.",
+      "enum": [
+        "android",
+        "ios",
+        "web",
+        "desktop"
+      ]
+    },
+    "device_type": {
+      "type": "string",
+      "description": "Category of device emitting the telemetry.",
+      "enum": [
+        "mobile",
+        "tablet",
+        "desktop",
+        "server",
+        "iot"
+      ]
+    },
+    "manufacturer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Device manufacturer when available.",
+      "maxLength": 64
+    },
+    "model": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Device model when available.",
+      "maxLength": 64
+    },
+    "app_version": {
+      "type": "string",
+      "description": "Application version running on the device.",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "os_name": {
+      "type": "string",
+      "description": "Operating system name.",
+      "enum": [
+        "android",
+        "ios",
+        "windows",
+        "macos",
+        "linux"
+      ]
+    },
+    "os_version": {
+      "type": "string",
+      "description": "Operating system version.",
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "network_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Network type active during the telemetry event.",
+      "enum": [
+        "wifi",
+        "4g",
+        "5g",
+        "ethernet",
+        "offline",
+        null
+      ]
+    },
+    "region": {
+      "type": "string",
+      "description": "Logical region associated with the telemetry source.",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code.",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "severity": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional severity classification for telemetry events with operational significance.",
+      "enum": [
+        "info",
+        "warning",
+        "critical",
+        null
+      ]
+    },
+    "threshold_breached": {
+      "type": "boolean",
+      "description": "Whether the metric crossed a predefined operational threshold.",
+      "default": false
+    },
+    "event_properties": {
+      "type": "object",
+      "description": "Optional flexible map for low-criticality telemetry attributes that do not justify top-level fields.",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      },
+      "default": {}
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_telemetry_20260308_000001",
+      "event_type": "device_telemetry",
+      "event_time": "2026-03-08T12:06:10Z",
+      "ingestion_time": "2026-03-08T12:06:11Z",
+      "producer_version": "1.0.0",
+      "schema_version": 1,
+      "source_system": "mobile-observability-sdk",
+      "partition_key": "device_a19f84",
+      "trace_id": "trace_b8a1f9dd21",
+      "device_id": "device_a19f84",
+      "user_id": "user_18429",
+      "session_id": "sess_7845129",
+      "metric_name": "network_latency_ms",
+      "metric_type": "gauge",
+      "metric_value": 482.0,
+      "metric_unit": "ms",
+      "platform": "android",
+      "device_type": "mobile",
+      "manufacturer": "Samsung",
+      "model": "SM-S918B",
+      "app_version": "2.4.1",
+      "os_name": "android",
+      "os_version": "14",
+      "network_type": "5g",
+      "region": "southeast",
+      "country_code": "BR",
+      "severity": "warning",
+      "threshold_breached": true,
+      "event_properties": {
+        "carrier": "carrier_br_01",
+        "foreground": true,
+        "sdk_version": "0.9.3"
+      }
+    }
+  ]
+}
