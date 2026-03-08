@@ -1,0 +1,4 @@
+confluent-kafka==2.8.2
+faker==37.0.2
+jsonschema==4.23.0
+python-dotenv==1.0.1
