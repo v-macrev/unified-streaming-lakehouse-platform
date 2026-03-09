@@ -13,6 +13,32 @@ volumes:
   grafana_data:
 
 services:
+  event-producer:
+    build:
+      context: ..
+      dockerfile: event_producer/Dockerfile
+    container_name: uslp-event-producer
+    hostname: event-producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - platform
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      KAFKA_TOPIC_USER_ACTIVITY: "events.user_activity.v1"
+      KAFKA_TOPIC_ORDERS: "events.orders.v1"
+      KAFKA_TOPIC_PAYMENTS: "events.payments.v1"
+      KAFKA_TOPIC_DEVICE_TELEMETRY: "events.device_telemetry.v1"
+      PRODUCER_APP_NAME: "event-producer"
+      PRODUCER_SOURCE_SYSTEM: "synthetic-event-generator"
+      PRODUCER_VERSION: "1.0.0"
+      PRODUCER_LOG_LEVEL: "INFO"
+      PRODUCER_INTERVAL_MS: "1000"
+      PRODUCER_BATCH_SIZE: "100"
+      PRODUCER_ENABLE_SCHEMA_VALIDATION: "true"
+      PRODUCER_SCHEMA_VERSION: "1"
+    restart: unless-stopped
   kafka:
     image: apache/kafka:3.9.0
     container_name: uslp-kafka
