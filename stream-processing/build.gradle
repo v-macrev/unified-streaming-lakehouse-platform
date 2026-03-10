@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.macrev.platform'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    flinkVersion = '1.20.1'
+    jacksonVersion = '2.17.2'
+    slf4jVersion = '2.0.16'
+}
+
+dependencies {
+    implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-kafka:${flinkVersion}"
+    implementation "org.apache.flink:flink-json:${flinkVersion}"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    runtimeOnly "org.slf4j:slf4j-simple:${slf4jVersion}"
+
+    testImplementation platform('org.junit:junit-bom:5.10.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+application {
+    mainClass = 'com.macrev.platform.UnifiedStreamingJob'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += [
+        '-Xlint:deprecation',
+        '-Xlint:unchecked'
+    ]
+}
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Title': 'Unified Streaming Lakehouse Platform - Flink Job',
+            'Implementation-Version': version,
+            'Main-Class': application.mainClass.get()
+        )
+    }
+}
+
+tasks.register('printRuntimeClasspath') {
+    group = 'help'
+    description = 'Prints the runtime classpath for debugging dependency resolution.'
+    doLast {
+        sourceSets.main.runtimeClasspath.each { println it }
+    }
+}
